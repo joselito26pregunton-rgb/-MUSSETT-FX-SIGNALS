@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: mussett-fx-signals
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    preDeployCommand: python initialize.py
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.14
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mussett-fx-db
+          property: connectionString
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: API_ACCESS_KEY
+        generateValue: true
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: WORKER_ENABLED
+        value: "true"
+      - key: TELEGRAM_POLLING_ENABLED
+        value: "true"
+databases:
+  - name: mussett-fx-db
+    plan: basic-256mb
